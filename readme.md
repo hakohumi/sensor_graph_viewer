@@ -17,6 +17,8 @@ Deno + Orkで構築する
 
 ### TODO
 
+- [x] REST API のサンプルコードを実装する
+  - <https://zenn.dev/azukiazusa/articles/804439f5afabe7>を参考に作成する
 - [ ] REST API サーバーとして動作する
 - [ ] 機器に応じてデータベース？テーブル？を分ける
 - [ ] sqlite3で受け取ったデータを保存する

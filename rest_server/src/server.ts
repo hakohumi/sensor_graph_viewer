@@ -1,11 +1,7 @@
-import {
-  Application,
-  Router,
-  RouterContext,
-} from 'https://deno.land/x/oak@v6.5.0/mod.ts'
+import { Application } from 'https://deno.land/x/oak@v6.5.0/mod.ts'
+import { router } from './router.ts'
 
 const app = new Application()
-const router = new Router()
 
 app.addEventListener('listen', ({ hostname, port, secure }) => {
   console.log(
@@ -17,10 +13,6 @@ app.addEventListener('listen', ({ hostname, port, secure }) => {
 
 app.addEventListener('error', (evt) => {
   console.log(evt.error)
-})
-
-router.get('/', (ctx: RouterContext) => {
-  ctx.response.body = 'Hello World!'
 })
 
 app.use(router.routes())
