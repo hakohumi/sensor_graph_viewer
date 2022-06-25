@@ -9,10 +9,11 @@
     "deno.lint": true,
     "deno.unstable": true,
     "code-runner.executorMap": {
-      "typescript": "deno run --watch --allow-net"
+      "typescript": "deno run"
     },
     "code-runner.executorMapByGlob": {
-      "test*.ts": "deno test"
+      "test*.ts": "deno test",
+      "server.ts": "deno run --watch --allow-net"
     }
   }
 }
