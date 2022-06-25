@@ -1,0 +1,18 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "deno.enable": true,
+    "deno.lint": true,
+    "deno.unstable": true,
+    "code-runner.executorMap": {
+      "typescript": "deno run"
+    },
+    "code-runner.executorMapByGlob": {
+      "test*.ts": "deno test"
+    }
+  }
+}
