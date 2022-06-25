@@ -6,9 +6,9 @@ router.get('/', (ctx: RouterContext) => {
   ctx.response.body = 'Hello World!'
 })
 
-// TODO: センサーのインスタンスを作成、インスタンスIDを返す
+// センサーのインスタンスを作成、インスタンスIDを返す
 router.post('/api/v1/sensor', powerSensorController.create_sensor_instance)
-// TODO: センサーのインスタンスを取得
+// センサーのインスタンスを取得
 router.get('/api/v1/sensor', powerSensorController.get_sensor_instance)
 
 // TODO: センサーデータの追加
