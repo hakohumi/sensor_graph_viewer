@@ -3,13 +3,23 @@ import {
   helpers,
   Status,
 } from 'https://deno.land/x/oak@v6.5.0/mod.ts'
+import { DB } from 'https://deno.land/x/sqlite@v3.4.0/mod.ts'
+import { SqlController } from '../../sql_controler/sql_controller.ts'
+
+const database = new SqlController(new DB('sqlite.db'))
 
 export const powerSensorController = {
-  // TODO: センサーのインスタンスを作成、インスタンスIDを返す
+  // センサーのインスタンスを作成、インスタンスIDを返す
   create_sensor_instance(ctx: RouterContext) {
     const a = ctx.request.body
-    console.log(`create sensor ${a}`)
-    ctx.response.body = { id: 123 }
+    console.log(`create sensor ${a.toString}`)
+
+    const instance_id = database.createInstanceTable()
+    console.log(`Instance_id ${instance_id}`)
+    const table = database.getAllInstanceTable()
+    console.log(`table ${table}`)
+
+    ctx.response.body = { id: instance_id, table: table }
     ctx.response.status = Status.Created
   },
   // TODO: センサーデータの追加
