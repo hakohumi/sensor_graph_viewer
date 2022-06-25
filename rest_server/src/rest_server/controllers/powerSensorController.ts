@@ -11,16 +11,20 @@ const database = new SqlController(new DB('sqlite.db'))
 export const powerSensorController = {
   // センサーのインスタンスを作成、インスタンスIDを返す
   create_sensor_instance(ctx: RouterContext) {
+    console.log('create_sensor_instance')
+
     const a = ctx.request.body
     console.log(`create sensor ${a.toString}`)
 
-    const instance_id = database.createInstanceTable()
+    const instance_id = database.addInstance()
     console.log(`Instance_id ${instance_id}`)
 
     ctx.response.body = { id: instance_id }
     ctx.response.status = Status.Created
   },
+
   get_sensor_instance(ctx: RouterContext) {
+    console.log('get_sensor_instance')
     const table = database.getAllInstanceTable()
     console.log(`table ${table}`)
     ctx.response.body = { instance_table: table }
