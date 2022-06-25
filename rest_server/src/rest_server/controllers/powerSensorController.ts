@@ -16,12 +16,16 @@ export const powerSensorController = {
 
     const instance_id = database.createInstanceTable()
     console.log(`Instance_id ${instance_id}`)
-    const table = database.getAllInstanceTable()
-    console.log(`table ${table}`)
 
-    ctx.response.body = { id: instance_id, table: table }
+    ctx.response.body = { id: instance_id }
     ctx.response.status = Status.Created
   },
+  get_sensor_instance(ctx: RouterContext) {
+    const table = database.getAllInstanceTable()
+    console.log(`table ${table}`)
+    ctx.response.body = { instance_table: table }
+  },
+
   // TODO: センサーデータの追加
   add_sensor_value(ctx: RouterContext) {
     const { id, value, aaa } = helpers.getQuery(ctx, { mergeParams: true })

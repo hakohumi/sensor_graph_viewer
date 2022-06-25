@@ -8,6 +8,9 @@ router.get('/', (ctx: RouterContext) => {
 
 // TODO: センサーのインスタンスを作成、インスタンスIDを返す
 router.post('/api/v1/sensor', powerSensorController.create_sensor_instance)
+// TODO: センサーのインスタンスを取得
+router.get('/api/v1/sensor', powerSensorController.get_sensor_instance)
+
 // TODO: センサーデータの追加
 router.put('/api/v1/sensor/:id/:value', powerSensorController.add_sensor_value)
 // TODO: センサーデータの取得
