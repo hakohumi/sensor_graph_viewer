@@ -21,6 +21,6 @@ Deno + Orkで構築する
   - <https://zenn.dev/azukiazusa/articles/804439f5afabe7>を参考に作成する
 - [x] sqlite3を使えるようにする
   - <https://zenn.dev/tkithrta/articles/ceb1c662ce7d75>を参考に作成する
-- [ ] REST API サーバーとして動作する
-- [ ] 機器に応じてデータベース？テーブル？を分ける
+- [x] REST API サーバーとして動作する
 - [ ] sqlite3で受け取ったデータを保存する
+- [ ] 機器に応じてデータベース？テーブル？を分ける

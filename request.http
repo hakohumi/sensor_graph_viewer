@@ -1,8 +1,11 @@
 ### echo Hello World!
 GET http://localhost:8080
 
-### Get All Books
-GET http://localhost:8080/api/v1/books
+### Get Books by ID
+POST http://localhost:8080/api/v1/sensor
+
+### Get Books by ID
+PUT http://localhost:8080/api/v1/sensor/aaa/222?aaa=2
 
 ### Get Books by ID
 GET http://localhost:8080/api/v1/books/1
