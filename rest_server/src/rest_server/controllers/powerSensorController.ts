@@ -31,17 +31,41 @@ export const powerSensorController = {
   },
 
   // TODO: センサーデータの追加
-  add_sensor_value(ctx: RouterContext) {
+  async add_sensor_value(ctx: RouterContext) {
     const { id, value, aaa } = helpers.getQuery(ctx, { mergeParams: true })
-    ctx.response.body = `add sensor data: ${id} value: ${value} aaa: ${aaa}`
+    const request_body = await ctx.request.body().value
+    console.log(`request body : ${typeof request_body}`)
+
+    // text/plainの場合
+    if (typeof request_body == 'string') {
+      database.addData(Number(id), Number(value))
+      ctx.response.body = `add sensor data: ${id} value: ${value} aaa: ${aaa}`
+    } else if (typeof request_body == 'object') {
+      // application/jsonの場合
+      console.log(` ${Object.entries(request_body)}`)
+      if ('id' in request_body && 'value' in request_body) {
+        ctx.response.body = `add sensor data: ${id} value: ${value}`
+        database.addData(Number(id), Number(value))
+        ctx.response.body = { id, value }
+        ctx.response.status = Status.Created
+      }
+
+      ctx.response.body = { id }
+      ctx.response.status = Status.BadRequest
+    } else {
+      ctx.response.body = { id }
+      ctx.response.status = Status.BadRequest
+    }
   },
   get_sensor_data(ctx: RouterContext) {
     const { id } = helpers.getQuery(ctx, { mergeParams: true })
-    ctx.response.body = `Get sensor data: ${id}`
+    database.getData(Number(id))
+    ctx.response.body = `Get sensor data: ${id} value: `
   },
 
   getAll(ctx: RouterContext) {
-    ctx.response.body = 'Get All sensor data'
+    const all_data = database.getAllData()
+    ctx.response.body = `Get All sensor data: ${all_data}`
   },
 
   //   // センサー側から設定の変更

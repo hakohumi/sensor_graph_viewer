@@ -65,27 +65,39 @@ export class SqlController {
     return result as InstanceID[]
   }
 
-  addValue(instance_id: InstanceID) {
+  addData(instance_id: InstanceID, value: number) {
     // センサーデータテーブル
-
+    const value_table_name = `instance_id_${instance_id}`
     this.db.query(
-      'CREATE TABLE IF NOT EXISTS values(id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT)'
+      'CREATE TABLE IF NOT EXISTS instance_id_1(id INTEGER PRIMARY KEY AUTOINCREMENT, value INT);'
+      // ,[value_table_name]
     )
+    console.log(`create value_table_name: ${value_table_name} `)
+
+    this.db.query('INSERT INTO instance_id_1 (value) VALUES(:value)', {
+      // value_table_name,
+      value,
+    })
   }
 
-  addData(instance_id: InstanceID, value: number) {
-    // for (const user of users) {
-    //   db.query('INSERT INTO users(user) VALUES(?)', [user])
-    // }
-    for (const user of this.db.query('SELECT * FROM users')) {
-      console.log(user)
+  getData(instance_id: InstanceID) {
+    const value = this.db.query(`select value from instance_id_${instance_id}`)
+    for (const a of value) {
+      console.log(a)
     }
   }
   close() {
     this.db.close()
   }
-}
 
-// class InstanceID {
-//   constructor(readonly id: number) {}
-// }
+  getAllData() {
+    console.log(`getAllData `)
+    return this.instance_id_list.map((e) => {
+      console.log(`e = ${e}`)
+      const result = this.db.query<[number]>(
+        `select value from instance_id_${e}`
+      )
+      return
+    })
+  }
+}

@@ -13,7 +13,7 @@
     },
     "code-runner.executorMapByGlob": {
       "test*.ts": "deno test",
-      "server.ts": "deno run --watch --allow-net"
+      "server.ts": "deno run --watch --allow-net --allow-read --allow-write"
     }
   }
 }
