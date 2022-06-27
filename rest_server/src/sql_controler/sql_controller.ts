@@ -4,9 +4,47 @@ type InstanceID = number
 
 export class SqlController {
   instance_id_list: number[] = [0]
+
   constructor(readonly db: DB) {
     this.db = db
     this.instance_id_list = this.initInstanceTable()
+  }
+
+  existInstance(instance_id: InstanceID): boolean {
+    const instance_id_list = this.db
+      .query<[number]>(`select instance_id from instances`)
+      .flat()
+
+    if (instance_id in instance_id_list) {
+      try {
+        // TODO: instance_id_〇テーブルが存在しているかの確認(すべての値を取得しているため、遅いかも)
+        const _ = this.db.query(`select value from instance_id_${instance_id}`)
+      } catch {
+        console.log(`instance_id_${instance_id} is not exist`)
+        return false
+      }
+
+      return true
+    }
+
+    console.log(`not exist in instance_id_list`)
+
+    return false
+  }
+
+  // TODO: データベースチェック
+  // TODO: データベース内のInstanceIDに重複がないかの確認
+  checkDatabase() {
+    const instance_id_list = this.db
+      .query<[number]>(`select instance_id from instances`)
+      .flat()
+
+    if (instance_id_list.length != new Set(instance_id_list).size) {
+      console.log(`重複あり`)
+      throw new Error(
+        'There is an abnormality in the database. Duplicate instance ID.'
+      )
+    }
   }
 
   initInstanceTable(): InstanceID[] {
@@ -14,6 +52,8 @@ export class SqlController {
     this.db.query(
       'CREATE TABLE IF NOT EXISTS instances(id INTEGER PRIMARY KEY AUTOINCREMENT, instance_id INTEGER)'
     )
+
+    this.checkDatabase()
 
     // TODO: すでにテーブルがある場合、各インスタンスごとのテープルもあるか確認する
 
@@ -39,11 +79,20 @@ export class SqlController {
     return instance_id_list
   }
 
-  initValueTable() {}
-
-  // センサーインスタンスの作成
+  // TODO: センサーインスタンスの作成
   addInstance() {
-    const new_instance_id = this.instance_id_list.slice(-1)[0] + 1
+    let new_instance_id: InstanceID
+    if (this.instance_id_list.length < 1) {
+      new_instance_id = 1
+    } else {
+      new_instance_id = this.instance_id_list.slice(-1)[0] + 1
+    }
+    console.log(`add Instance ${new_instance_id}`)
+
+    // TODO: もし追加する時に同じInstanceIDがあるかどうかの確認
+    if (new_instance_id in this.instance_id_list) {
+      console.log('jfjdsiojfaiojs')
+    }
     this.instance_id_list.push(new_instance_id)
     this.db.query('INSERT INTO instances(instance_id) VALUES(?)', [
       new_instance_id,
@@ -69,7 +118,7 @@ export class SqlController {
     // センサーデータテーブル
     const value_table_name = `instance_id_${instance_id}`
     this.db.query(
-      'CREATE TABLE IF NOT EXISTS instance_id_1(id INTEGER PRIMARY KEY AUTOINCREMENT, value INT);'
+      `CREATE TABLE IF NOT EXISTS instance_id_${instance_id}(id INTEGER PRIMARY KEY AUTOINCREMENT, value INT)`
       // ,[value_table_name]
     )
     console.log(`create value_table_name: ${value_table_name} `)
@@ -81,23 +130,31 @@ export class SqlController {
   }
 
   getData(instance_id: InstanceID) {
-    const value = this.db.query(`select value from instance_id_${instance_id}`)
-    for (const a of value) {
-      console.log(a)
+    // TODO: データがない場合
+    if (!this.existInstance(instance_id)) {
+      console.log('not instance')
+      return
     }
+    return this.db
+      .query<[number]>(`select value from instance_id_${instance_id}`)
+      .flat()
   }
+
   close() {
     this.db.close()
   }
 
   getAllData() {
     console.log(`getAllData `)
-    return this.instance_id_list.map((e) => {
-      console.log(`e = ${e}`)
-      const result = this.db.query<[number]>(
-        `select value from instance_id_${e}`
-      )
-      return
+    return this.instance_id_list.map((id) => {
+      if (!this.existInstance(id)) {
+        return { id, value: {} }
+      }
+      console.log(`id = ${id}`)
+      const value = this.db
+        .query<[number]>(`select value from instance_id_${id}`)
+        .flat()
+      return { id, value }
     })
   }
 }

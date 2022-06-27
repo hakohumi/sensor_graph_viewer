@@ -6,17 +6,19 @@ router.get('/', (ctx: RouterContext) => {
   ctx.response.body = 'Hello World!'
 })
 
+// TODO: 
 router.get('/api/v1', powerSensorController.getAll)
 
-// センサーのインスタンスを作成、インスタンスIDを返す
+// TODO: センサーのインスタンスを作成、インスタンスIDを返す
 router.post('/api/v1/sensor', powerSensorController.create_sensor_instance)
 // センサーのインスタンスを取得
 router.get('/api/v1/sensor', powerSensorController.get_sensor_instance)
 
+// TODO: あるインスタンスのデータを取得する
+router.get('/api/v1/sensor/:id', powerSensorController.get_sensor_data)
+
 // TODO: センサーデータの追加
 router.put('/api/v1/sensor/:id/:value', powerSensorController.add_sensor_value)
-// TODO: センサーデータの取得
-router.get('/api/v1/sensor/:id', powerSensorController.get_sensor_data)
 
 // router.get('/api/v1/books', booksController.getAll)
 // router.get('/api/v1/books/:id', booksController.get)

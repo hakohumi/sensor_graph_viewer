@@ -13,9 +13,6 @@ export const powerSensorController = {
   create_sensor_instance(ctx: RouterContext) {
     console.log('create_sensor_instance')
 
-    const a = ctx.request.body
-    console.log(`create sensor ${a.toString}`)
-
     const instance_id = database.addInstance()
     console.log(`Instance_id ${instance_id}`)
 
@@ -48,6 +45,7 @@ export const powerSensorController = {
         database.addData(Number(id), Number(value))
         ctx.response.body = { id, value }
         ctx.response.status = Status.Created
+        return
       }
 
       ctx.response.body = { id }
@@ -57,15 +55,29 @@ export const powerSensorController = {
       ctx.response.status = Status.BadRequest
     }
   },
+
+  // TODO: あるインスタンスのデータを取得する
   get_sensor_data(ctx: RouterContext) {
     const { id } = helpers.getQuery(ctx, { mergeParams: true })
-    database.getData(Number(id))
-    ctx.response.body = `Get sensor data: ${id} value: `
+    // TODO: データベースに指定したインスタンスIDが存在するか確認する
+    if (!database.existInstance(Number(id))) {
+      ctx.response.body = `not instance ${id}`
+      ctx.response.status = Status.BadRequest
+      return
+    }
+    const values = database.getData(Number(id))
+
+    if (values == undefined) {
+      throw new Error('cant pass here')
+    }
+
+    ctx.response.body = { id, values }
+    return
   },
 
   getAll(ctx: RouterContext) {
     const all_data = database.getAllData()
-    ctx.response.body = `Get All sensor data: ${all_data}`
+    ctx.response.body = all_data
   },
 
   //   // センサー側から設定の変更

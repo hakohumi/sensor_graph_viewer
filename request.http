@@ -1,23 +1,25 @@
-### Get Sensor Instance list
+# センサーインスタンスの一覧を見る
 GET http://localhost:8080/api/v1/sensor
 Content-Type: application/json
 
-### Create Sensor Instance
+### TODO: センサーインスタンスを登録する
 POST http://localhost:8080/api/v1/sensor
 Content-Type: application/json
 
-### Set application/json Value by ID
+### TODO: ある1つのセンサーインスタンスのデータを見る
+## 必要な情報: インスタンスID、値
+GET http://localhost:8080/api/v1/sensor/1
+Content-Type: application/json
+
+### TODO: センサー値をサーバーへ送信する
 PUT http://localhost:8080/api/v1/sensor/1/123
 Content-Type: application/json
 
 {"id": 1, "value": 123}
 
-### Get text/plain Value by ID
-GET http://localhost:8080/api/v1/sensor/1
-Content-Type: application/json
-
-### Get text/plain Value all
+### TODO: すべてのデータを見る
 GET http://localhost:8080/api/v1
+
 
 
 
