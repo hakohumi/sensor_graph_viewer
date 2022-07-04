@@ -24,7 +24,7 @@ export class InstanceIdTableController {
     }
 
     const instance_id_list = db
-      .query<[InstanceID]>(`select * from instances`)
+      .query<[InstanceID]>(`select instance_id from instances`)
       .flat()
 
     return instance_id_list
@@ -42,7 +42,7 @@ export class InstanceIdTableController {
 
   static existInstanceId(db: DB, instance_id: InstanceID): boolean {
     const instance_id_list = db
-      .query<[InstanceID]>(`select * from instances`)
+      .query<[InstanceID]>(`select instance_id from instances`)
       .flat()
 
     return instance_id_list.includes(instance_id)

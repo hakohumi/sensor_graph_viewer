@@ -50,23 +50,4 @@ export class SqlController {
     this.db.close()
   }
 
-  getAllData() {
-    console.log(`getAllData`)
-
-    const instance_id_list = InstanceIdTableController.getInstanceList(this.db)
-
-    if (instance_id_list == undefined) {
-      throw new Error('cant get all data')
-    }
-
-    return instance_id_list.map((id) => {
-      if (!InstanceIdTableController.existInstanceId(this.db, id)) {
-        return { id, value: {} }
-      }
-      const value = this.db
-        .query<[number]>(`select value from instance_id_${id}`)
-        .flat()
-      return { id, value }
-    })
-  }
 }

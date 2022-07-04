@@ -58,7 +58,28 @@ export const powerSensorController = {
   },
 
   getAll(ctx: RouterContext) {
-    const all_data = database.getAllData()
+    console.log(`getAllData`)
+
+    const instance_id_list = InstanceIdTableController.getInstanceList(
+      database.db
+    )
+
+    if (instance_id_list == undefined) {
+      throw new Error('cant get all data')
+    }
+
+    const all_data = instance_id_list.map((id) => {
+      if (!InstanceIdTableController.existInstanceId(database.db, id)) {
+        return { id, value: {} }
+      }
+    
+      const value = database.db
+        .query<[number]>(`select value from instance_id_${id}`)
+        .flat()
+      return { id, value }
+    })
+
+    // TODO: ここで各センサーのデータを組み立てる
     ctx.response.body = all_data
   },
 
