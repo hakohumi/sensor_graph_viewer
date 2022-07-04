@@ -4,59 +4,49 @@ import { DB } from 'https://deno.land/x/sqlite@v3.4.0/mod.ts'
 type InstanceID = number
 
 export class InstanceIdTableController {
-  static existInstance(db: DB, instance_id: InstanceID): boolean {
-    const instance_id_list = db
-      .query<[InstanceID]>(`select instance_id from instances`)
-      .flat()
+  // TODO: テーブルごとに、SQLの操作を抽象化したInterfaceを実装したテーブルコントローラークラスを作成する
 
-    if (instance_id in instance_id_list) {
-      try {
-        // TODO: instance_id_〇テーブルが存在しているかの確認(すべての値を取得しているため、遅いかも)
-        const _ = db.query(`select value from instance_id_${instance_id}`)
-      } catch {
-        console.log(`instance_id_${instance_id} table is not exist`)
-        return false
-      }
+  // TODO: データベースチェック
+  // TODO: データベース内のInstanceIDに重複がないかの確認
+  static checkInstanceTable(db: DB): InstanceID[] {
+    const isExistInstanceTable = db
+      .query<[InstanceID]>(
+        `SELECT COUNT(*) FROM sqlite_master WHERE TYPE='table' AND name='instances';`
+      )
+      .flat()[0]
 
-      return true
+    if (isExistInstanceTable == 0) {
+      console.log(`"instances" table is not exist. create table.`)
+
+      db.query(
+        `CREATE TABLE IF NOT EXISTS instances(id INTEGER PRIMARY KEY AUTOINCREMENT, instance_id INT)`
+      )
     }
 
-    console.log(`not exist in instance_id_list`)
+    const instance_id_list = db
+      .query<[InstanceID]>(`select * from instances`)
+      .flat()
 
-    return false
+    return instance_id_list
   }
 
-  // initInstanceTable(): InstanceID[] {
-  //   // センサーインスタンスIDテーブル
-  //   this.db.query(
-  //     'CREATE TABLE IF NOT EXISTS instances(id INTEGER PRIMARY KEY AUTOINCREMENT, instance_id INTEGER)'
-  //   )
+  static checkInstanceTableForDuplicates(instance_id_list: InstanceID[]) {
+    if (instance_id_list.length != new Set(instance_id_list).size) {
+      console.log(`重複あり`)
+      throw new Error(
+        'There is an abnormality in the database. Duplicate instance ID.'
+      )
+    }
+    return instance_id_list
+  }
 
-  //   this.checkDatabase()
+  static existInstanceId(db: DB, instance_id: InstanceID): boolean {
+    const instance_id_list = db
+      .query<[InstanceID]>(`select * from instances`)
+      .flat()
 
-  //   // TODO: すでにテーブルがある場合、各インスタンスごとのテープルもあるか確認する
-
-  //   const instance_id_list: InstanceID[] = []
-
-  //   // instance_id_listの初期化
-  //   for (const [instance_id] of this.db.query(
-  //     'SELECT instance_id FROM instances'
-  //   )) {
-  //     console.log(`instance_id: ${instance_id}`)
-  //     // nullチェック
-  //     if (instance_id == null) {
-  //       console.log('instance table is null')
-  //       return []
-  //     }
-  //     if (typeof instance_id == 'number') {
-  //       instance_id_list.push(instance_id)
-  //     } else {
-  //       throw new Error('instance_id is not number.')
-  //     }
-  //   }
-
-  //   return instance_id_list
-  // }
+    return instance_id_list.includes(instance_id)
+  }
 
   static getInstanceList(db: DB): InstanceID[] | undefined {
     try {
@@ -77,35 +67,42 @@ export class InstanceIdTableController {
       throw new Error('cant error')
     }
 
+    console.log(`instance_id_list = ${instance_id_list}`)
+
     let new_instance_id: InstanceID
     if (instance_id_list.length < 1) {
       new_instance_id = 1
+      console.log(`instance_id_list is 0`)
     } else {
-      new_instance_id = instance_id_list.slice(-1)[0] + 1
+      new_instance_id = instance_id_list[instance_id_list.length - 1] + 1
     }
     console.log(`add Instance ${new_instance_id}`)
 
-    // TODO: もし追加する時に同じInstanceIDがあるかどうかの確認
-    if (new_instance_id in instance_id_list) {
-      throw new Error('cant error')
+    if (typeof new_instance_id != 'number') {
+      throw new Error(`new_instance_id is not number: ${new_instance_id}`)
     }
 
-    db.query('INSERT INTO instances(instance_id) VALUES(?)', [new_instance_id])
+    // もし追加する時に同じInstanceIDがあるかどうかの確認
+    if (new_instance_id in instance_id_list) {
+      throw new Error(`すでに同じInstanceIDが存在します。 = ${new_instance_id}`)
+    }
 
+    db.query(`INSERT INTO instances(instance_id) VALUES(${new_instance_id})`)
+
+    if (!InstanceIdTableController.existInstanceId(db, new_instance_id)) {
+      throw new Error(`add Error: new_instance_id: ${new_instance_id}`)
+    }
+    console.log(`added instance_id: ${new_instance_id}`)
     return new_instance_id
   }
   static getAllInstanceTable(db: DB): InstanceID[] {
-    const query = db.query('select instance_id from instances')
-    const result = query
-      .map((e) => {
-        if (typeof Number(e) == 'number') {
-          return Number(e)
-        } else {
-          return
-        }
-      })
-      .filter((e) => e != undefined)
+    const instance_list = db.query<[InstanceID]>(
+      'select instance_id from instances'
+    )
+    const result = instance_list.flat().filter((e) => typeof e === 'number')
 
-    return result as InstanceID[]
+    console.log(`result =${result}`)
+
+    return result
   }
 }

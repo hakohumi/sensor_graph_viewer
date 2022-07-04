@@ -3,9 +3,9 @@ import { InstanceIdTableController } from './InstanceTableController.ts'
 
 type InstanceID = number
 
-export class SqlController implements InstanceIdTableController {
+export class SqlController {
   constructor(readonly db: DB) {
-    const instance_id_list = this.checkInstanceTable()
+    const instance_id_list = InstanceIdTableController.checkInstanceTable(db)
 
     for (const instance_id of instance_id_list) {
       this.checkInstanceDataTable(instance_id)
@@ -20,30 +20,14 @@ export class SqlController implements InstanceIdTableController {
       .flat()[0]
 
     if (isExistInstanceDataTable == 0) {
-      console.log(`instance_id_${isExistInstanceDataTable} table is not exist. create table.`)
+      console.log(
+        `"instance_id_${isExistInstanceDataTable}" table is not exist. create table.`
+      )
 
       this.db.query(
         `CREATE TABLE IF NOT EXISTS instance_id_${instance_id}(id INTEGER PRIMARY KEY AUTOINCREMENT, value INT)`
       )
     }
-  }
-
-  // TODO: テーブルごとに、SQLの操作を抽象化したInterfaceを実装したテーブルコントローラークラスを作成する
-
-  // TODO: データベースチェック
-  // TODO: データベース内のInstanceIDに重複がないかの確認
-  checkInstanceTable(): InstanceID[] {
-    const instance_id_list = this.db
-      .query<[number]>(`select instance_id from instances`)
-      .flat()
-
-    if (instance_id_list.length != new Set(instance_id_list).size) {
-      console.log(`重複あり`)
-      throw new Error(
-        'There is an abnormality in the database. Duplicate instance ID.'
-      )
-    }
-    return instance_id_list
   }
 
   getSensorData(instance_id: InstanceID): InstanceID[] | undefined {
@@ -76,10 +60,9 @@ export class SqlController implements InstanceIdTableController {
     }
 
     return instance_id_list.map((id) => {
-      if (!InstanceIdTableController.existInstance(this.db, id)) {
+      if (!InstanceIdTableController.existInstanceId(this.db, id)) {
         return { id, value: {} }
       }
-      console.log(`id = ${id}`)
       const value = this.db
         .query<[number]>(`select value from instance_id_${id}`)
         .flat()

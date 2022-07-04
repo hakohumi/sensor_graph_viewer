@@ -42,7 +42,7 @@ export const powerSensorController = {
   get_sensor_data(ctx: RouterContext) {
     const { id } = helpers.getQuery(ctx, { mergeParams: true })
     // TODO: データベースに指定したインスタンスIDが存在するか確認する
-    if (!InstanceIdTableController.existInstance(database.db, Number(id))) {
+    if (!InstanceIdTableController.existInstanceId(database.db, Number(id))) {
       ctx.response.body = `not instance ${id}`
       ctx.response.status = Status.BadRequest
       return
