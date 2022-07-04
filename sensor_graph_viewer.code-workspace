@@ -12,7 +12,7 @@
       "typescript": "deno run"
     },
     "code-runner.executorMapByGlob": {
-      "test*.ts": "deno test",
+      "test*.ts": "deno test --allow-net",
       "server.ts": "deno run --watch --allow-net --allow-read --allow-write"
     }
   }
