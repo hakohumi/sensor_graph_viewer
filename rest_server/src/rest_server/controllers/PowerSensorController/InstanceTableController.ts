@@ -1,5 +1,6 @@
 // データベースの中のインスタンスIDを管理するクラス
 import { DB } from 'https://deno.land/x/sqlite@v3.4.0/mod.ts'
+import { ValueTableController } from './ValueTableController.ts'
 
 type InstanceID = number
 
@@ -61,13 +62,12 @@ export class InstanceIdTableController {
   }
 
   // TODO: センサーインスタンスの作成
+  // TODO: 作成時、すでにインスタンスのデータテーブルが作成されている場合、エラー
   static addInstance(db: DB) {
     const instance_id_list = this.getInstanceList(db)
     if (instance_id_list == undefined) {
       throw new Error('cant error')
     }
-
-    console.log(`instance_id_list = ${instance_id_list}`)
 
     let new_instance_id: InstanceID
     if (instance_id_list.length < 1) {
@@ -89,12 +89,18 @@ export class InstanceIdTableController {
 
     db.query(`INSERT INTO instances(instance_id) VALUES(${new_instance_id})`)
 
+    // TODO:データテーブルも作成する
+    ValueTableController.createDataTable(db, new_instance_id)
+
+    // 正しく追加できたか確認
     if (!InstanceIdTableController.existInstanceId(db, new_instance_id)) {
       throw new Error(`add Error: new_instance_id: ${new_instance_id}`)
     }
+
     console.log(`added instance_id: ${new_instance_id}`)
     return new_instance_id
   }
+
   static getAllInstanceTable(db: DB): InstanceID[] {
     const instance_list = db.query<[InstanceID]>(
       'select instance_id from instances'

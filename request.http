@@ -8,7 +8,7 @@ Content-Type: application/json
 
 ### TODO: ある1つのセンサーインスタンスのデータを見る
 ## 必要な情報: インスタンスID、値
-GET http://localhost:8080/api/v1/sensor/2
+GET http://localhost:8080/api/v1/sensor/1
 Content-Type: application/json
 
 ### TODO: センサー値をサーバーへ送信する

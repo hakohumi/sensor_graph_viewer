@@ -4,9 +4,9 @@ import {
   Status,
 } from 'https://deno.land/x/oak@v6.5.0/mod.ts'
 import { DB } from 'https://deno.land/x/sqlite@v3.4.0/mod.ts'
-import { InstanceIdTableController } from '../../sql_controler/InstanceTableController.ts'
-import { SqlController } from '../../sql_controler/sql_controller.ts'
-import { ValueTableController } from '../../sql_controler/ValueTableController.ts'
+import { InstanceIdTableController } from './InstanceTableController.ts'
+import { SqlController } from '../../../sql_controler/sql_controller.ts'
+import { ValueTableController } from './ValueTableController.ts'
 
 const database = new SqlController(new DB('sqlite.db'))
 
@@ -47,7 +47,7 @@ export const powerSensorController = {
       ctx.response.status = Status.BadRequest
       return
     }
-    const values = database.getSensorData(Number(id))
+    const values = ValueTableController.getSensorData(database.db, Number(id))
 
     if (values == undefined) {
       throw new Error('cant pass here')
@@ -72,7 +72,7 @@ export const powerSensorController = {
       if (!InstanceIdTableController.existInstanceId(database.db, id)) {
         return { id, value: {} }
       }
-    
+
       const value = database.db
         .query<[number]>(`select value from instance_id_${id}`)
         .flat()
